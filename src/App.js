@@ -137,7 +137,7 @@ export default function App() {
             <strong>COVID-19 Vaccine Expectations</strong> by{" "}
             <a
               target="_blank"
-              rel="noreferrer"
+              rel="noreferrer noopener"
               href="https://github.com/vampaynani"
             >
               Vampaynani
@@ -149,7 +149,7 @@ export default function App() {
             (1) INEGI (2018), Población de 18 años y más.{" "}
             <a
               target="_blank"
-              rel="noreferrer"
+              rel="noreferrer noopener"
               href="https://www.inegi.org.mx/app/indicadores/?t=123&ag=00#tabMCcollapse-Indicadores"
             >
               https://www.inegi.org.mx/app/indicadores/?t=123&ag=00#tabMCcollapse-Indicadores
@@ -160,7 +160,7 @@ export default function App() {
             recibido por lo menos una dosis de la vacuna.{" "}
             <a
               target="_blank"
-              rel="noreferrer"
+              rel="noreferrer noopener"
               href="https://twitter.com/NTelevisa_com/status/1349164374582308865"
             >
               https://twitter.com/NTelevisa_com/status/1349164374582308865
