@@ -161,9 +161,10 @@ export default function App() {
             <a
               target="_blank"
               rel="noreferrer noopener"
-              href="https://twitter.com/NTelevisa_com/status/1349164374582308865"
+              href="https://www.gob.mx/salud/prensa/015-vacunacion-contra-covid-19-entra-en-etapa-expansiva-en-todo-el-territorio-nacional?idiom=es
+"
             >
-              https://twitter.com/NTelevisa_com/status/1349164374582308865
+              https://www.gob.mx/salud/prensa/015-vacunacion-contra-covid-19-entra-en-etapa-expansiva-en-todo-el-territorio-nacional?idiom=es
             </a>
           </p>
         </div>
