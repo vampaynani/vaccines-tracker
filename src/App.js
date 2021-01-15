@@ -24,9 +24,9 @@ function getCalculations(population, doses, daily) {
 
 export default function App() {
   const population = 85382288;
-  const doses = 192567;
+  const doses = 329983;
   const start = moment("20201225"); //.format();
-  const last = moment("20210113"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
+  const last = moment("20210114"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
   const diff = Math.trunc(moment.duration(last.diff(start)).as("days"));
   const dailyAmount = Math.trunc(doses / diff);
   const { progress, daysLeft, monthsLeft, yearsLeft } = getCalculations(
