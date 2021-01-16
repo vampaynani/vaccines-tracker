@@ -24,9 +24,9 @@ function getCalculations(population, doses, daily) {
 
 export default function App() {
   const population = 85382288;
-  const doses = 329983;
+  const doses = 415417;
   const start = moment("20201225"); //.format();
-  const last = moment("20210114"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
+  const last = moment("20210115"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
   const diff = Math.trunc(moment.duration(last.diff(start)).as("days"));
   const dailyAmount = Math.trunc(doses / diff);
   const { progress, daysLeft, monthsLeft, yearsLeft } = getCalculations(
@@ -161,10 +161,9 @@ export default function App() {
             <a
               target="_blank"
               rel="noreferrer noopener"
-              href="https://www.gob.mx/salud/prensa/015-vacunacion-contra-covid-19-entra-en-etapa-expansiva-en-todo-el-territorio-nacional?idiom=es
-"
+              href="https://www.gob.mx/salud/prensa/018-inicia-aplicacion-de-segunda-dosis-de-vacuna-contra-covid-19-para-personal-de-salud?idiom=es"
             >
-              https://www.gob.mx/salud/prensa/015-vacunacion-contra-covid-19-entra-en-etapa-expansiva-en-todo-el-territorio-nacional?idiom=es
+              https://www.gob.mx/salud/prensa/018-inicia-aplicacion-de-segunda-dosis-de-vacuna-contra-covid-19-para-personal-de-salud?idiom=es
             </a>
           </p>
         </div>
