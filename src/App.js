@@ -24,9 +24,9 @@ function getCalculations(population, doses, daily) {
 
 export default function App() {
   const population = 85382288;
-  const doses = 415417;
+  const doses = 461025;
   const start = moment("20201225"); //.format();
-  const last = moment("20210115"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
+  const last = moment("2021-01-16"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
   const diff = Math.trunc(moment.duration(last.diff(start)).as("days"));
   const dailyAmount = Math.trunc(doses / diff);
   const { progress, daysLeft, monthsLeft, yearsLeft } = getCalculations(
@@ -155,7 +155,7 @@ export default function App() {
               https://www.inegi.org.mx/app/indicadores/?t=123&ag=00#tabMCcollapse-Indicadores
             </a>
           </p>
-          <p>
+          <!--p>
             (2) Secretaría de Salud México (2020), Número de personas que han
             recibido por lo menos una dosis de la vacuna.{" "}
             <a
@@ -165,7 +165,7 @@ export default function App() {
             >
               https://www.gob.mx/salud/prensa/018-inicia-aplicacion-de-segunda-dosis-de-vacuna-contra-covid-19-para-personal-de-salud?idiom=es
             </a>
-          </p>
+          </p-->
         </div>
       </footer>
     </div>
