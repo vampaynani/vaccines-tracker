@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Numeral from "numeral";
 import moment from "moment";
 import "./styles.css";
@@ -6,8 +6,103 @@ import "./styles.css";
 moment.locale("es-mx", {
   months: "Enero Febrero Marzo Abril Mayo Junio Julio Agosto Septiembre Octubre Noviembre Diciembre".split(
     " "
-  )
+  ),
 });
+
+function CSVToArray(strData, strDelimiter) {
+  // Check to see if the delimiter is defined. If not,
+  // then default to comma.
+  strDelimiter = strDelimiter || ",";
+
+  // Create a regular expression to parse the CSV values.
+  var objPattern = new RegExp(
+    // Delimiters.
+    "(\\" +
+      strDelimiter +
+      "|\\r?\\n|\\r|^)" +
+      // Quoted fields.
+      '(?:"([^"]*(?:""[^"]*)*)"|' +
+      // Standard fields.
+      '([^"\\' +
+      strDelimiter +
+      "\\r\\n]*))",
+    "gi"
+  );
+
+  // Create an array to hold our data. Give the array
+  // a default empty first row.
+  var arrData = [[]];
+
+  // Create an array to hold our individual pattern
+  // matching groups.
+  var arrMatches = null;
+
+  // Keep looping over the regular expression matches
+  // until we can no longer find a match.
+  while ((arrMatches = objPattern.exec(strData))) {
+    // Get the delimiter that was found.
+    var strMatchedDelimiter = arrMatches[1];
+
+    // Check to see if the given delimiter has a length
+    // (is not the start of string) and if it matches
+    // field delimiter. If id does not, then we know
+    // that this delimiter is a row delimiter.
+    if (strMatchedDelimiter.length && strMatchedDelimiter !== strDelimiter) {
+      // Since we have reached a new row of data,
+      // add an empty row to our data array.
+      arrData.push([]);
+    }
+
+    var strMatchedValue;
+
+    // Now that we have our delimiter out of the way,
+    // let's check to see which kind of value we
+    // captured (quoted or unquoted).
+    if (arrMatches[2]) {
+      // We found a quoted value. When we capture
+      // this value, unescape any double quotes.
+      strMatchedValue = arrMatches[2].replace(new RegExp('""', "g"), '"');
+    } else {
+      // We found a non-quoted value.
+      strMatchedValue = arrMatches[3];
+    }
+
+    // Now that we have our value string, let's add
+    // it to the data array.
+    arrData[arrData.length - 1].push(strMatchedValue);
+  }
+
+  // Return the parsed data.
+  return arrData;
+}
+
+async function getData() {
+  const res = await fetch(
+    "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"
+  );
+  const data = await res.text();
+  const csvArr = CSVToArray(data);
+  const mexicoRows = csvArr
+    .filter((item) => item[0] === "Mexico")
+    .map((item) => {
+      const parsedItem = {};
+      csvArr[0].forEach((field, index) => {
+        parsedItem[field] = item[index];
+      });
+      return parsedItem;
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+  return mexicoRows;
+}
+
+async function getSource() {
+  const res = await fetch(
+    "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/locations.csv"
+  );
+  const data = await res.text();
+  const csvArr = CSVToArray(data);
+  return csvArr.find((row) => row[0] === "Mexico");
+}
 
 function getCalculations(population, doses, daily) {
   const progress = doses / population;
@@ -18,17 +113,19 @@ function getCalculations(population, doses, daily) {
     progress,
     daysLeft,
     monthsLeft,
-    yearsLeft
+    yearsLeft,
   };
 }
 
 export default function App() {
+  const [doses, setDoses] = useState(0);
+  const [start, setStart] = useState(moment("20201224"));
+  const [latest, setLatest] = useState(moment());
+  const [dailyAmount, setDaily] = useState(0);
+  const [source, setSource] = useState(null);
+
   const population = 85382288;
-  const doses = 461025;
-  const start = moment("20201225"); //.format();
-  const last = moment("2021-01-16"); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
-  const diff = Math.trunc(moment.duration(last.diff(start)).as("days"));
-  const dailyAmount = Math.trunc(doses / diff);
+  const diff = Math.trunc(moment.duration(latest.diff(start)).as("days"));
   const { progress, daysLeft, monthsLeft, yearsLeft } = getCalculations(
     population,
     doses,
@@ -38,9 +135,23 @@ export default function App() {
     progress: progress70,
     daysLeft: daysLeft70,
     monthsLeft: monthsLeft70,
-    yearsLeft: yearsLeft70
+    yearsLeft: yearsLeft70,
   } = getCalculations(population * 0.7, doses, dailyAmount);
   const DATE_FORMAT = "LLL";
+  if (doses === 0) {
+    getData().then((data) => {
+      setDoses(data[0].people_vaccinated);
+      setStart(moment(data[data.length - 1].date)); //.format();
+      setLatest(moment(data[0].date)); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
+      setDaily(data[0].daily_vaccinations);
+    });
+  }
+
+  if (!source) {
+    getSource().then((data) => {
+      setSource(data);
+    });
+  }
 
   return (
     <div className="App">
@@ -64,7 +175,7 @@ export default function App() {
             </p>
             <p className="column box is-flex is-flex-direction-column">
               <span>Ultima fecha de actualización</span>
-              <span>{last.format(DATE_FORMAT)}</span>
+              <span>{latest.format(DATE_FORMAT)}</span>
             </p>
             <p className="column box is-flex is-flex-direction-column">
               <span>Días transcurridos</span>
@@ -80,11 +191,18 @@ export default function App() {
           </div>
         </div>
         <div className="block is-flex is-flex-direction-column">
-          <p>Porcentaje de población vacunada con al menos una dosis</p>
-          <progress class="progress is-primary" value={doses} max={population}>
+          <p>
+            Porcentaje de población vacunada con al menos una dosis -{" "}
+            {Numeral(progress).format("0.000%")}
+          </p>
+          <progress
+            className="progress is-primary"
+            value={doses}
+            max={population}
+          >
             {Numeral(progress).format("0.000%")}
           </progress>
-          <table class="table is-bordered is-striped">
+          <table className="table is-bordered is-striped">
             <tbody>
               <tr>
                 <td>Días para cubrir la población total</td>
@@ -105,15 +223,18 @@ export default function App() {
           <h2 className="subtitle">
             Considerando que la inmunidad de rebaño se alcanzaría con un 70%
           </h2>
-          <p>Porcentaje de población vacunada con al menos una dosis</p>
+          <p>
+            Porcentaje de población vacunada con al menos una dosis -{" "}
+            {Numeral(progress70).format("0.000%")}
+          </p>
           <progress
-            class="progress is-primary"
+            className="progress is-primary"
             value={doses}
             max={Math.trunc(population * 0.7)}
           >
             {Numeral(progress70).format("0.000%")}
           </progress>
-          <table class="table is-bordered is-striped">
+          <table className="table is-bordered is-striped">
             <tbody>
               <tr>
                 <td>Días para cubrir la población total</td>
@@ -131,14 +252,14 @@ export default function App() {
           </table>
         </div>
       </section>
-      <footer class="footer">
-        <div class="content has-text-centered">
+      <footer className="footer">
+        <div className="content has-text-centered">
           <p>
             <strong>COVID-19 Vaccine Expectations</strong> by{" "}
             <a
               target="_blank"
               rel="noreferrer noopener"
-              href="https://github.com/vampaynani"
+              href="https://github.com/vampaynani/vaccines-tracker"
             >
               Vampaynani
             </a>
@@ -155,17 +276,14 @@ export default function App() {
               https://www.inegi.org.mx/app/indicadores/?t=123&ag=00#tabMCcollapse-Indicadores
             </a>
           </p>
-          <!--p>
-            (2) Secretaría de Salud México (2020), Número de personas que han
-            recibido por lo menos una dosis de la vacuna.{" "}
-            <a
-              target="_blank"
-              rel="noreferrer noopener"
-              href="https://www.gob.mx/salud/prensa/018-inicia-aplicacion-de-segunda-dosis-de-vacuna-contra-covid-19-para-personal-de-salud?idiom=es"
-            >
-              https://www.gob.mx/salud/prensa/018-inicia-aplicacion-de-segunda-dosis-de-vacuna-contra-covid-19-para-personal-de-salud?idiom=es
-            </a>
-          </p-->
+          {source && (
+            <p>
+              (2) Secretaría de Salud México (2020).{" "}
+              <a target="_blank" rel="noreferrer noopener" href={source[5]}>
+                {source[5]}
+              </a>
+            </p>
+          )}
         </div>
       </footer>
     </div>
