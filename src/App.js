@@ -107,13 +107,13 @@ async function getSource() {
 function getCalculations(population, doses, daily) {
   const progress = doses / population;
   const daysLeft = Math.trunc((population - doses) / daily);
-  const monthsLeft = Math.trunc(daysLeft / 30);
-  const yearsLeft = Math.trunc(monthsLeft / 12);
+  const futureDate = moment().add(daysLeft, "days");
+  const duration = moment.duration(futureDate.diff(moment()));
+  const timeLeft = `${duration.years()} años, ${duration.months()} meses y ${duration.days()} días`;
   return {
     progress,
     daysLeft,
-    monthsLeft,
-    yearsLeft,
+    timeLeft,
   };
 }
 
@@ -126,7 +126,7 @@ export default function App() {
 
   const population = 85382288;
   const diff = Math.trunc(moment.duration(latest.diff(start)).as("days"));
-  const { progress, daysLeft, monthsLeft, yearsLeft } = getCalculations(
+  const { progress, daysLeft, timeLeft } = getCalculations(
     population,
     doses,
     dailyAmount
@@ -134,8 +134,7 @@ export default function App() {
   const {
     progress: progress70,
     daysLeft: daysLeft70,
-    monthsLeft: monthsLeft70,
-    yearsLeft: yearsLeft70,
+    timeLeft: timeLeft70,
   } = getCalculations(population * 0.7, doses, dailyAmount);
   const DATE_FORMAT = "LLL";
   if (doses === 0) {
@@ -205,16 +204,16 @@ export default function App() {
           <table className="table is-bordered is-striped">
             <tbody>
               <tr>
-                <td>Días para cubrir la población total</td>
+                <td>
+                  Días adicionales requeridos para cubrir la población total
+                </td>
                 <td>{daysLeft}</td>
               </tr>
               <tr>
-                <td>Meses para cubrir la población total</td>
-                <td>{monthsLeft}</td>
-              </tr>
-              <tr>
-                <td>Años para cubrir la población total</td>
-                <td>{yearsLeft}</td>
+                <td>
+                  Tiempo adicional requerido para cubrir la población total
+                </td>
+                <td>{timeLeft}</td>
               </tr>
             </tbody>
           </table>
@@ -237,16 +236,16 @@ export default function App() {
           <table className="table is-bordered is-striped">
             <tbody>
               <tr>
-                <td>Días para cubrir la población total</td>
+                <td>
+                  Días adicionales requeridos para cubrir la inmunidad de rebaño
+                </td>
                 <td>{daysLeft70}</td>
               </tr>
               <tr>
-                <td>Meses para cubrir la población total</td>
-                <td>{monthsLeft70}</td>
-              </tr>
-              <tr>
-                <td>Años para cubrir la población total</td>
-                <td>{yearsLeft70}</td>
+                <td>
+                  Tiempo adicional requerido para cubrir la imunidad de rebaño
+                </td>
+                <td>{timeLeft70}</td>
               </tr>
             </tbody>
           </table>
@@ -261,7 +260,7 @@ export default function App() {
               rel="noreferrer noopener"
               href="https://github.com/vampaynani/vaccines-tracker"
             >
-              Vampaynani
+              vampaynani
             </a>
             . The source code is licensed{" "}
             <a href="http://opensource.org/licenses/mit-license.php">MIT</a>.
