@@ -124,7 +124,7 @@ export default function App() {
   const [dailyAmount, setDaily] = useState(0);
   const [source, setSource] = useState(null);
 
-  const population = 85382288;
+  const population = 94006461;
   const diff = Math.trunc(moment.duration(latest.diff(start)).as("days"));
   const { progress, daysLeft, timeLeft } = getCalculations(
     population,
@@ -266,13 +266,13 @@ export default function App() {
             <a href="http://opensource.org/licenses/mit-license.php">MIT</a>.
           </p>
           <p>
-            (1) INEGI (2018), Población de 18 años y más.{" "}
+            (1) INEGI (2020), Población de 15 años y más.{" "}
             <a
               target="_blank"
               rel="noreferrer noopener"
-              href="https://www.inegi.org.mx/app/indicadores/?t=123&ag=00#tabMCcollapse-Indicadores"
+              href="https://www.inegi.org.mx/temas/estructura/"
             >
-              https://www.inegi.org.mx/app/indicadores/?t=123&ag=00#tabMCcollapse-Indicadores
+              https://www.inegi.org.mx/temas/estructura/
             </a>
           </p>
           {source && (
