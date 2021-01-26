@@ -158,7 +158,7 @@ export default function App() {
         <h1 className="title">Progreso vacunación COVID-19 México</h1>
         <div className="block">
           <h2 className="subtitle">
-            Poblacion de 18 años o más {Numeral(population).format("0,0")}
+            Poblacion de 15 años o más {Numeral(population).format("0,0")}
             <sup>(1)</sup>
           </h2>
           <h2 className="subtitle">
