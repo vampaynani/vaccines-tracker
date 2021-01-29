@@ -139,7 +139,7 @@ export default function App() {
   const DATE_FORMAT = "LLL";
   if (doses === 0) {
     getData().then((data) => {
-      setDoses(data[0].people_vaccinated);
+      setDoses(data[0].people_vaccinated || data[1].people_vaccinated);
       setStart(moment(data[data.length - 1].date)); //.format();
       setLatest(moment(data[0].date)); //.format("dddd, MMMM Do YYYY, h:mm:ss a");
       setDaily(data[0].daily_vaccinations);
